@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:23:52 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/11 19:07:51 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/20 19:31:26 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,24 +76,24 @@ const unsigned short	& Bureaucrat::getGrade(void) const throw ()
 
 Bureaucrat	& Bureaucrat::operator ++ (void) throw (GradeTooHighException) {
 	if (grade == highest_grade) throw GradeTooHighException ();
-	++ grade;
+	-- grade;
 	return *this;
 }
 Bureaucrat	Bureaucrat::operator ++ (int) throw (GradeTooHighException) {
 	if (grade == highest_grade) throw GradeTooHighException ();
 	const Bureaucrat	hold (*this);
-	++ grade;
+	-- grade;
 	return hold;
 }
 Bureaucrat	& Bureaucrat::operator -- (void) throw (GradeTooLowException) {
 	if (grade == lowest_grade) throw GradeTooLowException ();
-	-- grade;
+	++ grade;
 	return *this;
 }
 Bureaucrat	Bureaucrat::operator -- (int) throw (GradeTooLowException) {
 	if (grade == lowest_grade) throw GradeTooLowException ();
 	const Bureaucrat	hold (*this);
-	-- grade;
+	++ grade;
 	return hold;
 }
 
