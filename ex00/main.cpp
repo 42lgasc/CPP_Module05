@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:24:24 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/11 18:57:05 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/20 18:40:16 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ int	main(void) throw () {
 	Bureaucrat	malcol3 ("Malcol Ⅲ");
 	malcol3 = malcol2;
 
-	try { Bureaucrat ("Iznogoud",	+ Bureaucrat::highest_grade - 1); }
+	try { Bureaucrat ("Iznogoud",	+ Bureaucrat::c_highest_grade - 1); }
 	catch (const std::exception	& e) { ft_warn(e); }
-	try { Bureaucrat ("Gero",		+ Bureaucrat::lowest_grade + 1); }
+	try { Bureaucrat ("Gero",		+ Bureaucrat::c_lowest_grade + 1); }
 	catch (const std::exception	& e) { ft_warn(e); }
 
 	std::cout << malcol3.getName() << '\n' << malcol3.getGrade() << '\n';
@@ -34,16 +34,17 @@ int	main(void) throw () {
 		<<			malcol3 --.getGrade() << ' '
 		<<			(-- malcol3).getGrade() << '\n';
 
-	try { ++ Bureaucrat ("System32",		+ Bureaucrat::highest_grade); }
+	try { ++ Bureaucrat ("System32",		+ Bureaucrat::c_highest_grade); }
 	catch (const std::exception	& e) { ft_warn(e); }
 	try {
-		std::cout << Bureaucrat ("systemd",	+ Bureaucrat::highest_grade)	++;
+		std::cout << Bureaucrat ("systemd",	+ Bureaucrat::c_highest_grade)	++;
 	}
 	catch (const std::exception	& e) { ft_warn(e); }
-	try { -- Bureaucrat ("Clippy",				+ Bureaucrat::lowest_grade); }
+	try { -- Bureaucrat ("Clippy",			+ Bureaucrat::c_lowest_grade); }
 	catch (const std::exception	& e) { ft_warn(e); }
 	try {
-		std::cout << Bureaucrat ("chrome.exe",	+ Bureaucrat::lowest_grade)	--;
+		std::cout
+			<< Bureaucrat ("chrome.exe",	+ Bureaucrat::c_lowest_grade)	--;
 	}
 	catch (const std::exception	& e) { ft_warn(e); }
 

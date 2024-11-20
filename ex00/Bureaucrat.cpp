@@ -13,6 +13,11 @@
 #include "Bureaucrat.hpp"
 #include <sstream> // ostringstream
 
+#if __has_include ("Form.hpp")
+# include "Form.hpp"
+# include <iostream> // cout
+#endif
+
 # define UNUSED	__attribute__ ((unused))
 
 std::string
@@ -26,9 +31,8 @@ std::string
 // frens ·‿·
 // ////
 
-std::ostream
-		& operator << (std::ostream	& s, const Bureaucrat	& b) throw ()
-		{ return s << b.getName() << ", bureaucrat grade " << b.getGrade(); }
+std::ostream	& operator << (std::ostream	& s, const Bureaucrat	& b)
+{ return s << b.getName() << ", bureaucrat grade " << b.getGrade(); }
 
 
 
@@ -45,12 +49,13 @@ std::ostream
 
 // Canonical Four
 
-// No default constructor, due to name requirement.
-Bureaucrat::Bureaucrat		(const Bureaucrat	& original) throw ():
-		name (original.name), grade (original.grade)	{}
-Bureaucrat					& Bureaucrat::operator = (const Bureaucrat	& other)
-		throw () { grade = other.grade; return *this; }
-Bureaucrat::~ Bureaucrat	(void) throw ()				{}
+Bureaucrat::Bureaucrat		(void)							throw ():
+	name ("bureaucratic Bureaucrative"),	grade (c_lowest_grade)		{}
+Bureaucrat::Bureaucrat		(const Bureaucrat	& original)	throw ():
+	name (original.name), grade (original.grade)						{}
+Bureaucrat	& Bureaucrat::operator = (const Bureaucrat	& other) throw ()
+{ grade = other.grade; return *this; }
+Bureaucrat::~ Bureaucrat	(void)							throw ()	{}
 
 
 // other Constructors
@@ -59,8 +64,8 @@ Bureaucrat::Bureaucrat
 		(const std::string	& new_name, const unsigned char	& new_grade)
 		throw (GradeTooHighException, GradeTooLowException):
 		name (new_name), grade (new_grade) {
-	if (grade < highest_grade)	throw GradeTooHighException	();
-	if (grade > lowest_grade)	throw GradeTooLowException	();
+	if (grade < c_highest_grade)	throw GradeTooHighException	();
+	if (grade > c_lowest_grade)	throw GradeTooLowException	();
 }
 
 
@@ -75,27 +80,51 @@ const unsigned short	& Bureaucrat::getGrade(void) const throw ()
 // Mutators
 
 Bureaucrat	& Bureaucrat::operator ++ (void) throw (GradeTooHighException) {
-	if (grade == highest_grade) throw GradeTooHighException ();
+	if (grade == c_highest_grade) throw GradeTooHighException ();
 	-- grade;
 	return *this;
 }
 Bureaucrat	Bureaucrat::operator ++ (int) throw (GradeTooHighException) {
-	if (grade == highest_grade) throw GradeTooHighException ();
+	if (grade == c_highest_grade) throw GradeTooHighException ();
 	const Bureaucrat	hold (*this);
 	-- grade;
 	return hold;
 }
 Bureaucrat	& Bureaucrat::operator -- (void) throw (GradeTooLowException) {
-	if (grade == lowest_grade) throw GradeTooLowException ();
+	if (grade == c_lowest_grade) throw GradeTooLowException ();
 	++ grade;
 	return *this;
 }
 Bureaucrat	Bureaucrat::operator -- (int) throw (GradeTooLowException) {
-	if (grade == lowest_grade) throw GradeTooLowException ();
+	if (grade == c_lowest_grade) throw GradeTooLowException ();
 	const Bureaucrat	hold (*this);
 	++ grade;
 	return hold;
 }
+
+
+// Methods
+
+#if __has_include ("Form.hpp")
+
+void	Bureaucrat::signForm(Form	& f) const throw () {
+	const std::string	c_fail_message1 (" couldn't sign "),
+						c_fail_message2 (" because ");
+	if (f.hasSignature()) {
+		std::cout << name << c_fail_message1 << f.getName() << c_fail_message2
+			<< "it has a signature already.\n";
+		return ;
+	}
+	try {
+		f.beSigned(*this); std::cout << name << " signed " << f.getName()
+			<< '\n';
+	}
+	catch (const std::exception	& e) {
+		std::cout << name << c_fail_message1 << f.getName() << c_fail_message2
+			<< e.what() << ".\n";
+	}
+}
+#endif
 
 
 
@@ -113,7 +142,7 @@ Bureaucrat	Bureaucrat::operator -- (int) throw (GradeTooLowException) {
 // Constants
 
 const std::string	Bureaucrat::GradeTooHighException::what
-	= ft_concatenate("Grade cannot be higher than ", + highest_grade);
+	= ft_concatenate("Grade cannot be higher than ", + c_highest_grade);
 
 
 // Canonical Four
@@ -137,7 +166,7 @@ Bureaucrat::GradeTooHighException::~ GradeTooHighException	(void) throw ()	{}
 // Constants
 
 const std::string	Bureaucrat::GradeTooLowException::what
-	= ft_concatenate("Grade cannot be lower than ", + lowest_grade);
+	= ft_concatenate("Grade cannot be lower than ", + c_lowest_grade);
 
 
 // Canonical Four
