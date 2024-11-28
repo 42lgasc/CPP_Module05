@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 15:07:00 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/20 19:34:16 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/28 23:20:51 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ int	main(void) {
 		instantiation ("template Instantiation"),	linking ("Linking", 41, 93);
 
 	try {
-		Form ("school Acquisition", ++ Form::SigningGrade
-				(Form::c_highest_signing_grade), Form::ExecutionGrade (86));
+		Form ("school Acquisition",
+				++ Form::SigningGrade (Form::c_highest_signing_grade),
+				Form::ExecutionGrade (86));
 	}
 	catch (const std::exception	& e) { ft_warn(e); }
 	try {

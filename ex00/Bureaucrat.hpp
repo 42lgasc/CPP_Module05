@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:25:06 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/20 18:28:41 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/28 22:05:55 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@
 # define WARN_UNUSED_RESULT	__attribute__ ((warn_unused_result))
 # define VIEW				const throw () WARN_UNUSED_RESULT
 
+# if __has_include ("Form.hpp")
+
 class Form;
+# endif
 
 
 // frens ·‿·
@@ -36,6 +39,8 @@ class Bureaucrat {
 	// inner Classes
 
 	class GradeTooHighException: public std::domain_error {
+		typedef GradeTooHighException	t_self;
+	
 		static const std::string	what;
 	
 		GradeTooHighException
@@ -45,7 +50,6 @@ class Bureaucrat {
 		GradeTooHighException	(const GradeTooHighException &)	throw ();
 		~ GradeTooHighException	(void)							throw ();
 	};
-
 	class GradeTooLowException: public std::domain_error {
 		static const std::string	what;
 	
@@ -57,18 +61,43 @@ class Bureaucrat {
 		~ GradeTooLowException	(void)							throw ();
 	};
 
+public:
+	class Grade {
+		unsigned char	g;
+	
+		Grade	(void)							throw ();
+	public:
+		Grade	(const Grade &)					throw ();
+		Grade	& operator = (const Grade &)	throw ();
+		~ Grade	(void)							throw ();
+	
+		explicit Grade	(const unsigned char & grade) throw ();
+	
+		Grade	& operator	++ (void)	throw (),
+				operator	++ (int)	throw () WARN_UNUSED_RESULT,
+				& operator	-- (void)	throw (),
+				operator	-- (int)	throw () WARN_UNUSED_RESULT;
+		bool	operator <	(const Grade &) VIEW,
+				operator >	(const Grade &) VIEW,
+				operator <=	(const Grade &) VIEW,
+				operator >=	(const Grade &) VIEW,
+				operator ==	(const Grade &) VIEW,
+				operator != (const Grade &) VIEW;
+	
+		operator unsigned short	(void) const throw ();
+	};
+
 
 	// Constants
 
-public:
-	static const unsigned char	c_highest_grade = 1,	c_lowest_grade = 150;
+	static const Grade	c_highest_grade,	c_lowest_grade;
 
 
 	// Fields
 
 private:
 	const std::string	name;
-	unsigned short		grade;
+	Grade				grade;
 
 
 	// Canonical Four
@@ -82,15 +111,15 @@ public:
 
 	// other Constructors
 
-	explicit Bureaucrat	(const std::string & name,
-			const unsigned char & grade = + c_lowest_grade)
+	explicit Bureaucrat
+		(const std::string & name, const unsigned char & grade = c_lowest_grade)
 		throw (GradeTooHighException, GradeTooLowException);
 
 
 	// Accessors
 
-	const std::string		& getName(void)		VIEW;
-	const unsigned short	& getGrade(void)	VIEW;
+	const std::string	& getName(void)		VIEW;
+	const Grade			& getGrade(void)	VIEW;
 
 
 	// Mutators
@@ -102,9 +131,11 @@ public:
 				operator	-- (int)	throw (GradeTooLowException)
 					WARN_UNUSED_RESULT;
 
+# if __has_include ("Form.hpp")
 
 	// Methods
 
 	void	signForm(Form &) const throw ();
+# endif
 };
 #endif

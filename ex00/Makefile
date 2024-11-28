@@ -6,7 +6,7 @@
 #    By: lgasc <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/08 18:19:19 by lgasc             #+#    #+#              #
-#    Updated: 2024/11/11 15:22:13 by lgasc            ###   ########.fr        #
+#    Updated: 2024/11/29 00:45:48 by lgasc            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -70,7 +70,7 @@ GXXFLAGS +=	-Wsized-deallocation -Wredundant-tags -Wcatch-value=3\
 			-Wcomma-subscript -Wvolatile -Wsuggest-final-methods\
 			-Waligned-new=all -Wconditionally-supported -Wnoexcept\
 			-Wnamespaces -Wsuggest-final-types -Wplacement-new=2\
-			-Wtemplates -Wstrict-null-sentinel -Wclass-memaccess
+			-Wstrict-null-sentinel -Wclass-memaccess
 
 ifeq "$(filter g++ clang++, $(CXX))" \
 	"$(if $(filter %.cpp %.tpp, $(SOURCES) $(MAIN)),,No .cpp nor .tpp)"
@@ -128,17 +128,17 @@ RESET =			\033[0m
 #OLIVE_BACK =	\033[43m
 #GREY_FORE =	\033[90m
 #WHITE_FORE =	\033[97m
-LOW_SCRIPT =	\033[22;2;23;30m
+LOW_SCRIPT =	\033[22;23;25;7m
 L_C =	$(LOW_SCRIPT)
 # Loose inspiration from a gnu head
-GNU_SCRIPT =	\033[2;3;90m
+GNU_SCRIPT =	\033[22;3;27m
 G_C =	$(GNU_SCRIPT)
-GNU_STYLE =		\033[2;3;43;90m
+GNU_STYLE =		\033[3;30;43m
 G_Y =	$(GNU_STYLE)
 # Warning sCript
-W_C =			\033[22;1;32m
+W_C =			\033[1;6;27m
 # Warning stYle, poison colours
-W_Y =			\033[1;32;45m
+W_Y =			\033[1;6;32;45m
 BACKQUOTE =	`#`# Vim acts funny when a variable contains one.
 REMOVING_START =	'$(G_Y)Removing $(BACKQUOTE)$(L_C)'
 RM_S =	$(REMOVING_START)
@@ -167,9 +167,9 @@ CAMEL_TO_SCREAM =	's/[^A-Za-z]/_/g;s/([A-Z])([A-Z][a-z])/\1_\2/g;$\
 $(NAME):	$(MAIN) $(OBJECTS) #$(DEP) #$(MAIN) $(OBJECTS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(MAIN) $(OBJECTS) $(LDLIBS) --output $(NAME)
 	-norminette
-	-grep -PRn $(DIRT) --colour=auto --include='*.[cht]pp' --include='*.[ch]'\
+	-@grep -PRn $(DIRT) --colour=auto --include='*.[cht]pp' --include='*.[ch]'\
 	 || echo '$(G_Y)No dirt found.$(RESET)'
-	-for h in $$(find * -name \*.h -o -name '*.[ht]pp');\
+	-@for h in $$(find * -name \*.h -o -name '*.[ht]pp');\
 	 do g=$$(echo $$h|sed -E $(CAMEL_TO_SCREAM)); if ! grep -wq $$g $$h;\
 	   then e=+; echo $(H_G)$$g$(NF_IN)$$h$(W_B); fi done;\
 	 if [ -z $$e ]; then echo $(H_OK); fi
@@ -177,17 +177,17 @@ $(NAME):	$(MAIN) $(OBJECTS) #$(DEP) #$(MAIN) $(OBJECTS) $(HEADERS)
 all:		$(NAME)
 
 clean:		
-	#$(MAKE) -C $(dir $(LIBFT)) fclean
-	for o in $(OBJECTS); \
+	@#$(MAKE) -C $(dir $(LIBFT)) fclean
+	@for o in $(OBJECTS); \
 	 do if [ -f $$o ]; then if [ -z $$rm ]; then echo -n $(RM_S)$$o;\
 	   else echo -n $(RM_M)$$o; fi; rm=+; rm $$o; fi done; if [ -n ''$$rm ];\
 	 then echo $(RM_E); else echo '$(G_Y)No object file to remove.$(RESET)'; fi
-	if [ -z "$(filter re, $(MAKECMDGOALS))"];\
+	@if [ -z "$(filter re, $(MAKECMDGOALS))" ];\
 	 then if [ -f $(DEP) ]; then echo $(RM_S)$(DEP)$(RM_E); rm $(DEP);\
 	  else echo '$(G_Y)No dependency file to remove.$(RESET)'; fi fi
 
 fclean:		clean
-	if [ -f $(NAME) ]; then echo $(RM_S)$(NAME)$(RM_E); rm $(NAME);\
+	@if [ -f $(NAME) ]; then echo $(RM_S)$(NAME)$(RM_E); rm $(NAME);\
 	 else echo '$(G_Y)No executable to remove.$(RESET)'; fi
 
 re:			fclean all
@@ -200,10 +200,9 @@ ifeq "$(filter clean fclean, $(MAKECMDGOALS))" ""
 endif
 
 $(DEP):		$(MAIN) $(SOURCES)
-	$(RM) $@
-	for s in $^; do $(CC) -MM $$s>>$@; done
-	# This is the only place where `-e` is necessary. Why?
-	echo -e '$(G_Y)Dependency file `$(L_C)$@$(G_C)` made.$(RESET)'
+	@: > $@; for s in $^; do $(CC) -MM $$s >> $@; done
+	@# This is the only place where `-e` is necessary. Why?
+	@echo -e '$(G_Y)Dependency file `$(L_C)$@$(G_C)` made.$(RESET)'
 
 $(LIBFT):	
 	$(MAKE) -C $(dir $@) #bonus

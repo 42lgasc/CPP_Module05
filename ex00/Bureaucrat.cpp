@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:23:52 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/20 19:31:26 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/28 22:05:45 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,8 @@
 # include <iostream> // cout
 #endif
 
-# define UNUSED	__attribute__ ((unused))
-
-std::string
-	ft_concatenate(const std::string & prefix, const unsigned char & suffix)
+static std::string
+ft_concatenate(const std::string & prefix, const unsigned char & suffix)
 	throw ();
 
 
@@ -47,6 +45,12 @@ std::ostream	& operator << (std::ostream	& s, const Bureaucrat	& b)
 // Bureaucrat
 
 
+// Constants
+
+const Bureaucrat::Grade
+Bureaucrat::c_highest_grade (1),	Bureaucrat::c_lowest_grade (150);
+
+
 // Canonical Four
 
 Bureaucrat::Bureaucrat		(void)							throw ():
@@ -61,20 +65,20 @@ Bureaucrat::~ Bureaucrat	(void)							throw ()	{}
 // other Constructors
 
 Bureaucrat::Bureaucrat
-		(const std::string	& new_name, const unsigned char	& new_grade)
-		throw (GradeTooHighException, GradeTooLowException):
+(const std::string	& new_name, const unsigned char	& new_grade)
+	throw (GradeTooHighException, GradeTooLowException):
 		name (new_name), grade (new_grade) {
-	if (grade < c_highest_grade)	throw GradeTooHighException	();
-	if (grade > c_lowest_grade)	throw GradeTooLowException	();
+	if (grade < c_lowest_grade)		throw GradeTooLowException	();
+	if (grade > c_highest_grade)	throw GradeTooHighException	();
 }
 
 
 // Accessors
 
-const std::string		& Bureaucrat::getName(void) const throw ()
-		{ return name; }
-const unsigned short	& Bureaucrat::getGrade(void) const throw ()
-		{ return grade; }
+const std::string
+& Bureaucrat::getName(void)		const throw () { return name; }
+const Bureaucrat::Grade
+& Bureaucrat::getGrade(void)	const throw () { return grade; }
 
 
 // Mutators
@@ -147,14 +151,13 @@ const std::string	Bureaucrat::GradeTooHighException::what
 
 // Canonical Four
 
-Bureaucrat::GradeTooHighException::GradeTooHighException	(void)	throw ():
-		std::domain_error (what)											{}
+Bureaucrat::GradeTooHighException::GradeTooHighException	(void)
+							throw (): std::domain_error (what)				{}
 Bureaucrat::GradeTooHighException::GradeTooHighException
-		(const GradeTooHighException	& original)					throw ():
-		std::domain_error (original)										{}
+(const t_self	& original)	throw (): std::domain_error (original)			{}
 Bureaucrat::GradeTooHighException
-		& Bureaucrat::GradeTooHighException::operator =
-		(UNUSED const GradeTooHighException	& other) throw () { return *this; }
+& Bureaucrat::GradeTooHighException::operator = (const t_self & other) throw ()
+{ std::domain_error::operator = (other); return *this; }
 Bureaucrat::GradeTooHighException::~ GradeTooHighException	(void) throw ()	{}
 
 
@@ -172,14 +175,67 @@ const std::string	Bureaucrat::GradeTooLowException::what
 // Canonical Four
 
 Bureaucrat::GradeTooLowException::GradeTooLowException	(void)	throw ():
-		std::domain_error (what)											{}
+	std::domain_error (what)												{}
 Bureaucrat::GradeTooLowException::GradeTooLowException
-		(const GradeTooLowException	& original)					throw ():
-		std::domain_error (original)										{}
-Bureaucrat::GradeTooLowException
-		& Bureaucrat::GradeTooLowException::operator =
-		(UNUSED const GradeTooLowException	& other) throw () { return *this; }
+(const GradeTooLowException	& original)							throw ():
+	std::domain_error (original)											{}
+Bureaucrat::GradeTooLowException	&
+Bureaucrat::GradeTooLowException::operator =
+(const GradeTooLowException	& other) throw ()
+{ std::domain_error::operator = (other); return *this; }
 Bureaucrat::GradeTooLowException::~ GradeTooLowException	(void) throw ()	{}
+
+
+
+// ////
+// Grade
+
+
+// Canonical Four
+
+// No default constructor, due to value requirement
+Bureaucrat::Grade::Grade
+(const Grade	& original) throw ():	g (original.g) {}
+Bureaucrat::Grade
+& Bureaucrat::Grade::operator = (const Grade	& other) throw ()
+{ g = other.g; return *this; }
+Bureaucrat::Grade::~ Grade	(void) throw () {}
+
+
+// other Constructors
+
+Bureaucrat::Grade::Grade	(const unsigned char	& grade) throw ():
+	g (grade) {}
+
+
+// Operators
+
+Bureaucrat::Grade
+& Bureaucrat::Grade::operator ++ (void) throw () { -- g; return *this; }
+Bureaucrat::Grade	Bureaucrat::Grade::operator ++ (int) throw ()
+{ Grade	before (*this); ++ *this; return before; }
+Bureaucrat::Grade
+& Bureaucrat::Grade::operator -- (void) throw () { ++ g; return *this; }
+Bureaucrat::Grade	Bureaucrat::Grade::operator -- (int) throw ()
+{ Grade	before (*this); -- *this; return before; }
+
+bool	Bureaucrat::Grade::operator < (const Grade	& other) const throw ()
+{ return g > other.g; }
+bool	Bureaucrat::Grade::operator > (const Grade	& other) const throw ()
+{ return other < *this; }
+bool	Bureaucrat::Grade::operator <= (const Grade	& other) const throw ()
+{ return not operator > (other); }
+bool	Bureaucrat::Grade::operator >= (const Grade	& other) const throw ()
+{ return not operator < (other); }
+bool	Bureaucrat::Grade::operator == (const Grade	& other) const throw ()
+{ return g == other.g; }
+bool	Bureaucrat::Grade::operator != (const Grade	& other) const throw ()
+{ return not operator == (other); }
+
+
+// Conversions
+
+Bureaucrat::Grade::operator unsigned short	(void) const throw () { return g; }
 
 
 

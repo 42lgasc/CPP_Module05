@@ -6,14 +6,14 @@
 #    By: lgasc <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/08 18:19:19 by lgasc             #+#    #+#              #
-#    Updated: 2024/11/19 19:09:15 by lgasc            ###   ########.fr        #
+#    Updated: 2024/11/29 00:48:30 by lgasc            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME =			Form_up,_maggots!
 MAIN =			main.cpp
 DEFINITIONS =	#METHOD_INFO=false SPECIAL_INFO=false
-CLASSES =		Bureaucrat Form
+CLASSES =		Form Bureaucrat
 SOURCES =		$(addsuffix .cpp, $(CLASSES)) #$(MAIN)
 HEADERS =		$(addsuffix .hpp, $(CLASSES))
 DEPENDENCY =	dependency.d#$(addsuffix .d, $(NAME))
@@ -30,7 +30,8 @@ CPPFLAGS =	$(addprefix -D, $(DEFINITIONS))
 CCFLAGS +=	-Wall -Wstrict-overflow=5 -Wnarrowing -Wattributes -Wnonnull -g\
 			-Wwrite-strings -Wextra -Werror -Wshadow -Wpedantic -Wdeprecated\
 			-Wmissing-format-attribute -Wnull-dereference -Wmissing-noreturn\
-			-Wunused-macros
+			-Wunused-macros -Wmemset-transposed-args -Wmissing-include-dirs\
+			-Wmissing-declarations -Wunused-const-variable -ftabstop=4
 
 GCCFLAGS +=	-Wattribute-alias=2 -Wsuggest-attribute=const -Wstringop-overflow=4\
 			-Wsuggest-attribute=pure -Wsuggest-attribute=cold -Wduplicated-cond\
@@ -38,9 +39,20 @@ GCCFLAGS +=	-Wattribute-alias=2 -Wsuggest-attribute=const -Wstringop-overflow=4\
 			-Wduplicated-branches -Wsuggest-attribute=format\
 			-Wunused-const-variable=2 -fanalyzer
 
-CLANGFLAGS +=	-Wproperty-attribute-mismatch -Wunused-const-variable#-Xanalyzer
+CLANGFLAGS +=	-Wproperty-attribute-mismatch -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic\
+				-Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wrange-loop-construct#-Xanalyzer
 
-CFLAGS +=	$(CCFLAGS) -Wsuggest-attribute=returns_nonnull -Wenum-conversion
+CFLAGS +=	$(CCFLAGS) -Wsuggest-attribute=returns_nonnull -Wenum-conversion\
+			-Wmissing-parameter-name -Wdeprecated-literal-operator -Wunicode\
+			-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any
 ifeq ($(filter gcc clang, $(CC)),$(if $(filter %.c, $(SOURCES) $(MAIN)),,No .c))
  $(warning ,----------------------------------------------------------------.)
  $(warning | Consider specifying `gcc` or `clang` for more extensive checks |)
@@ -51,12 +63,43 @@ ifeq ($(CC), gcc)
  ifeq "$(firstword $(shell (gcc -dumpversion;echo 11)|sort -n))" "11"
   CFLAGS +=	-Wmismatched-dealloc -Wmismatched-new-delete -Wfree-nonheap-object\
 			-Wsizeof-array-div -Wstringop-overread -Wtsan -Warray-parameter\
-			-Wvla-parameter
+			-Wvla-parameter -Wunicode -Wunicode-homoglyph -Wunicode-whitespace\
+			-Wunicode-zero-width -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic\
+			-Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic -Xanalyzer\
+			-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+			-Wtrailing-whitespace=any -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+			-Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wmissing-parameter-name -Wdeprecated-literal-operator\
+			-Wdeprecated-literal-operator -WWW-gcc11 -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wdeprecated-literal-operator -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator
  endif
 else ifeq ($(CC), clang)
  CFLAGS +=	$(CLANGFLAGS) -Wmismatched-dealloc -Wmismatched-new-delete\
 			-Wfree-nonheap-object -Wsizeof-array-div -Wstringop-overread -Wtsan\
-			-Warray-parameter -Wvla-parameter
+			-Warray-parameter -Wvla-parameter -Xanalyzer\
+			-Wstrict-potentially-direct-selector -Xanalyzer\
+			-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+			-Wtrailing-whitespace=any -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wstrict-potentially-direct-selector\
+			-Wdeprecated-literal-operator -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wmissing-parameter-name -Wdeprecated-literal-operator\
+			-Wdeprecated-literal-operator -WWW-clang -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wdeprecated-literal-operator -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator
 endif
 
 CXXSTD =	c++98
@@ -70,7 +113,7 @@ GXXFLAGS +=	-Wsized-deallocation -Wredundant-tags -Wcatch-value=3\
 			-Wcomma-subscript -Wvolatile -Wsuggest-final-methods\
 			-Waligned-new=all -Wconditionally-supported -Wnoexcept\
 			-Wnamespaces -Wsuggest-final-types -Wplacement-new=2\
-			-Wtemplates -Wstrict-null-sentinel -Wclass-memaccess
+			-Wstrict-null-sentinel -Wclass-memaccess
 
 ifeq "$(filter g++ clang++, $(CXX))" \
 	"$(if $(filter %.cpp %.tpp, $(SOURCES) $(MAIN)),,No .cpp nor .tpp)"
@@ -79,7 +122,60 @@ ifeq "$(filter g++ clang++, $(CXX))" \
  $(warning `------------------------------------------------------------------')
 endif
 ifneq "$(CXXSTD)" "c++98"
- CXXFLAGS +=	-Wsuggest-override
+ CXXFLAGS +=	-Wsuggest-override -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Wunicode\
+				-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -WWW-98\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wdeprecated-literal-operator\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wunicode -Wunicode-homoglyph -Wunicode-whitespace\
+				-Wunicode-zero-width -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic\
+				-Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Xanalyzer\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Xanalyzer\
+				-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Xanalyzer -Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Xanalyzer -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wunicode -Wunicode-homoglyph -Wunicode-whitespace\
+				-Wunicode-zero-width -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic\
+				-Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wdeprecated-literal-operator
 endif
 ifeq ($(CXX), g++)
  CXXFLAGS +=	$(GCCFLAGS) $(GXXFLAGS)
@@ -90,28 +186,187 @@ ifeq ($(CXX), g++)
 			-Wvla-parameter -Wctad-maybe-unsupported -Wrange-loop-construct\
 			-Wdeprecated-enum-enum-conversion -Wrange-loop-construct\
 			-Wdeprecated-enum-float-conversion -Wvexing-parse\
-			-Winvalid-imported-macros -Wdeprecated-literal-operator
+			-Winvalid-imported-macros -Wdeprecated-literal-operator -Xanalyzer\
+			-Wunicode -Wunicode-homoglyph -Wunicode-whitespace\
+			-Wunicode-zero-width -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic\
+			-Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic -Wunicode\
+			-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wdeprecated-literal-operator -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wdeprecated-literal-operator -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+			-Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Xanalyzer\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wunicode -Wunicode-homoglyph\
+			-Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+			-Wdocumentation -Wdocumentation-pedantic -Xanalyzer\
+			-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+			-Wtrailing-whitespace=any -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+			-Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Xanalyzer -Wcalloc-transposed-args -Wleading-whitespace=tabs\
+			-Wtrailing-whitespace=any -Wmissing-parameter-name\
+			-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+			-Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Xanalyzer -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wmissing-parameter-name -Wdeprecated-literal-operator -Wunicode\
+			-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+			-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+			-Wcompound-token-split-by-space -Wdocumentation\
+			-Wdocumentation-pedantic -Wcalloc-transposed-args\
+			-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+			-Wmissing-parameter-name -Wdeprecated-literal-operator\
+			-Wdeprecated-literal-operator
  endif
  ifeq "$(firstword $(shell (g++ -dumpversion;echo 13)|sort -n))" "13"
-  CXXFLAGS +=	-Wdangling-reference -Wself-move -Winvalid-constexpr
+  CXXFLAGS +=	-Wdangling-reference -Wself-move -Winvalid-constexpr -Xanalyzer\
+				-Wunicode -Wunicode-homoglyph -Wunicode-whitespace\
+				-Wunicode-zero-width -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic\
+				-Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Wunicode\
+				-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wdeprecated-literal-operator -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wdeprecated-literal-operator -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Xanalyzer\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Xanalyzer\
+				-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Xanalyzer -Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Xanalyzer -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator -Wunicode\
+				-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wdeprecated-literal-operator
  endif
  ifeq "$(firstword $(shell (g++ -dumpversion;echo 14)|sort -n))" "14"
-  CXXFLAGS +=	-Wtemplate-id-cdtor
+  CXXFLAGS +=	-Wtemplate-id-cdtor -Xanalyzer -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Wunicode\
+				-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wdeprecated-literal-operator -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wdeprecated-literal-operator -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Xanalyzer\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wmissing-variable-declarations -Wcompound-token-split-by-space\
+				-Wdocumentation -Wdocumentation-pedantic -Xanalyzer\
+				-Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Xanalyzer -Wcalloc-transposed-args -Wleading-whitespace=tabs\
+				-Wtrailing-whitespace=any -Wmissing-parameter-name\
+				-Wdeprecated-literal-operator -Wunicode -Wunicode-homoglyph\
+				-Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Xanalyzer -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator -Wunicode\
+				-Wunicode-homoglyph -Wunicode-whitespace -Wunicode-zero-width\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wstrict-potentially-direct-selector\
+				-Wdeprecated-literal-operator -Wmissing-variable-declarations\
+				-Wcompound-token-split-by-space -Wdocumentation\
+				-Wdocumentation-pedantic -Wcalloc-transposed-args\
+				-Wleading-whitespace=tabs -Wtrailing-whitespace=any\
+				-Wmissing-parameter-name -Wdeprecated-literal-operator\
+				-Wdeprecated-literal-operator
  endif
 else ifeq ($(CXX), clang++)
  CXXFLAGS +=	$(CLANGFLAGS) -Wself-move -Wdeprecated-enum-float-conversion\
-				-Wfree-nonheap-object -Wsizeof-array-div -Wrange-loop-construct\
-				-Wrange-loop-construct -Wdeprecated-enum-enum-conversion\
-				-Wmismatched-new-delete -Wctad-maybe-unsupported -Wvexing-parse\
-				-Winvalid-constexpr#-Wcomma-subscript -Wtemplates -Wnoexcept\
+				-Wfree-nonheap-object -Wsizeof-array-div -Wvexing-parse\
+				-Wdeprecated-enum-enum-conversion -Winvalid-constexpr\
+				-Wmismatched-new-delete -Wctad-maybe-unsupported#\
 				-Wsuggest-final-types -Wconditionally-supported -Wcatch-value=3\
 				-Wsuggest-final-methods -Wnamespaces -Wvolatile -Wvla-parameter\
 				-Wstringop-overread -Wsized-deallocation -Wstrict-null-sentinel\
 				-Wredundant-tags -Wclass-memaccess-Wmultiple-inheritance -Wtsan\
 				-Wvirtual-inheritance -Wdangling-reference -Wmismatched-dealloc\
 				-Wtemplate-id-cdtor -Warray-parameter -Winvalid-imported-macros\
-				-Wdeprecated-literal-operator\
-				-Wplacement-new=2 -Waligned-new=all
+				-Xanalyzer -Wcomma-subscript -Wplacement-new=2 -Waligned-new=all
 endif
 
 
@@ -167,27 +422,29 @@ CAMEL_TO_SCREAM =	's/[^A-Za-z]/_/g;s/([A-Z])([A-Z][a-z])/\1_\2/g;$\
 $(NAME):	$(MAIN) $(OBJECTS) #$(DEP) #$(MAIN) $(OBJECTS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(MAIN) $(OBJECTS) $(LDLIBS) --output $(NAME)
 	-norminette
-	-grep -PRn $(DIRT) --colour=auto --include='*.[cht]pp' --include='*.[ch]'\
+	-@grep -PRn $(DIRT) --colour=auto --include='*.[cht]pp' --include='*.[ch]'\
 	 || echo '$(G_Y)No dirt found.$(RESET)'
-	-for h in $$(find * -name \*.h -o -name '*.[ht]pp');\
+	-@for h in $$(find * -name \*.h -o -name '*.[ht]pp');\
 	 do g=$$(echo $$h|sed -E $(CAMEL_TO_SCREAM)); if ! grep -wq $$g $$h;\
 	   then e=+; echo $(H_G)$$g$(NF_IN)$$h$(W_B); fi done;\
 	 if [ -z $$e ]; then echo $(H_OK); fi
+	-@echo $(CFLAGS)|xargs -d' ' -I{} echo C{}|sort|uniq -cd
+	-@echo $(CXXFLAGS)|xargs -d' ' -I{} echo X{}|sort|uniq -cd
 
 all:		$(NAME)
 
 clean:		
-	#$(MAKE) -C $(dir $(LIBFT)) fclean
-	for o in $(OBJECTS); \
+	@#$(MAKE) -C $(dir $(LIBFT)) fclean
+	@for o in $(OBJECTS); \
 	 do if [ -f $$o ]; then if [ -z $$rm ]; then echo -n $(RM_S)$$o;\
 	   else echo -n $(RM_M)$$o; fi; rm=+; rm $$o; fi done; if [ -n ''$$rm ];\
 	 then echo $(RM_E); else echo '$(G_Y)No object file to remove.$(RESET)'; fi
-	if [ -z "$(filter re, $(MAKECMDGOALS))"];\
+	@if [ -z "$(filter re, $(MAKECMDGOALS))" ];\
 	 then if [ -f $(DEP) ]; then echo $(RM_S)$(DEP)$(RM_E); rm $(DEP);\
 	  else echo '$(G_Y)No dependency file to remove.$(RESET)'; fi fi
 
 fclean:		clean
-	if [ -f $(NAME) ]; then echo $(RM_S)$(NAME)$(RM_E); rm $(NAME);\
+	@if [ -f $(NAME) ]; then echo $(RM_S)$(NAME)$(RM_E); rm $(NAME);\
 	 else echo '$(G_Y)No executable to remove.$(RESET)'; fi
 
 re:			fclean all
@@ -200,10 +457,9 @@ ifeq "$(filter clean fclean, $(MAKECMDGOALS))" ""
 endif
 
 $(DEP):		$(MAIN) $(SOURCES)
-	: > $@
-	for s in $^; do $(CC) -MM $$s>>$@; done
-	# This is the only place where `-e` is necessary. Why?
-	echo -e '$(G_Y)Dependency file `$(L_C)$@$(G_C)` made.$(RESET)'
+	@: > $@; for s in $^; do $(CC) -MM $$s >> $@; done
+	@# This is the only place where `-e` is necessary. Why?
+	@echo -e '$(G_Y)Dependency file `$(L_C)$@$(G_C)` made.$(RESET)'
 
 $(LIBFT):	
 	$(MAKE) -C $(dir $@) #bonus

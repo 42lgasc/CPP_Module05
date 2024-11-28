@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:01:28 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/20 19:35:31 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/28 23:18:35 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ const Form::ExecutionGrade	& Form::getExecutionGrade(void)	const throw ()
 // Methods
 
 void	Form::beSigned(const Bureaucrat	& b) throw (GradeTooLowException) {
-	if (SigningGrade (b.getGrade()) > signing_grade)
+	if (SigningGrade (b.getGrade()) < signing_grade)
 		throw GradeTooLowException ();
 	signature = true;
 }
@@ -102,12 +102,12 @@ std::ostream	& operator << (std::ostream	& s, const Form	& f) {
 // Utilities
 
 Form::t_result	Form::checkValidity(void) const throw () {
-	if (signing_grade < c_highest_signing_grade
-			or execution_grade < c_highest_execution_grade)
-	{ t_result	r (new GradeTooHighException); return r; }
-	if (signing_grade > c_lowest_signing_grade
-			or execution_grade > c_lowest_execution_grade)
+	if (signing_grade < c_lowest_signing_grade
+			or execution_grade < c_lowest_execution_grade)
 	{ t_result	r (new GradeTooLowException); return r; }
+	if (signing_grade > c_highest_signing_grade
+			or execution_grade > c_highest_execution_grade)
+	{ t_result	r (new GradeTooHighException); return r; }
 	t_result	r;
 	return r;
 }
@@ -129,38 +129,37 @@ Form::t_result	Form::checkValidity(void) const throw () {
 
 // No default constructor, due to value requirement
 Form::SigningGrade::SigningGrade	(const SigningGrade	& original)	throw ():
-	g (original.g)									{}
+	Grade (original)								{}
 Form::SigningGrade
 & Form::SigningGrade::operator = (const SigningGrade	& other) throw ()
-{ g = other.g; return *this; }
+{ Grade::operator = (other); return *this; }
 Form::SigningGrade::~ SigningGrade	(void) throw ()	{}
 
 
 // other Constructors
 
-Form::SigningGrade::SigningGrade
-(const unsigned char	& grade) throw ():	g (grade) {}
+Form::SigningGrade::SigningGrade	(const unsigned char	& grade) throw ():
+	Grade (grade) {}
 
 
 // Operators
 
-const unsigned char	& Form::SigningGrade::operator *(void) const throw ()
-{ return g; }
-Form::SigningGrade
-& Form::SigningGrade::operator ++ (void) throw () { -- g; return *this; }
-Form::SigningGrade
-& Form::SigningGrade::operator -- (void) throw () { ++ g; return *this; }
+const Bureaucrat::Grade	& Form::SigningGrade::operator *(void) const throw ()
+{ return *this; }
+Form::SigningGrade	& Form::SigningGrade::operator ++ (void) throw ()
+{ Grade::operator -- (); return *this; }
+Form::SigningGrade	& Form::SigningGrade::operator -- (void) throw ()
+{ Grade::operator ++ (); return *this; }
 bool	Form::SigningGrade::operator < (const SigningGrade	& other)
-	const throw () { return g < other.g; }
+	const throw () { return Grade::operator < (other); }
 bool	Form::SigningGrade::operator > (const SigningGrade	& other)
-	const throw () { return other.g < g; }
+	const throw () { return other < *this; }
 
 
 // frens ·‿·
 
-std::ostream
-& operator << (std::ostream	& os, const Form::SigningGrade	& sg)
-{ return os << static_cast <unsigned short>(*sg); }
+std::ostream	& operator << (std::ostream	& o, const Form::SigningGrade	& g)
+{ return o << *g; }
 
 
 
@@ -171,39 +170,38 @@ std::ostream
 // Canonical Four
 
 // No default constructor, due to value requirement
-Form::ExecutionGrade::ExecutionGrade
-(const ExecutionGrade	& original)				throw (): g (original.g)	{}
+Form::ExecutionGrade::ExecutionGrade	(const ExecutionGrade	& original)
+	throw (): Grade (original)							{}
 Form::ExecutionGrade
 & Form::ExecutionGrade::operator = (const ExecutionGrade	& other) throw ()
-{ g = other.g; return *this; }
-Form::ExecutionGrade::~ ExecutionGrade	(void)	throw ()					{}
+{ Grade::operator = (other); return *this; }
+Form::ExecutionGrade::~ ExecutionGrade	(void) throw ()	{}
 
 
 // other Constructors
 
-Form::ExecutionGrade::ExecutionGrade
-(const unsigned char	& grade) throw (): g (grade) {}
+Form::ExecutionGrade::ExecutionGrade	(const unsigned char	& grade)
+	throw (): Grade (grade) {}
 
 
 // Operators
 
-const unsigned char	& Form::ExecutionGrade::operator *(void) const throw ()
-{ return g; }
-Form::ExecutionGrade
-& Form::ExecutionGrade::operator ++ (void) throw () { -- g; return *this; }
-Form::ExecutionGrade
-& Form::ExecutionGrade::operator -- (void) throw () { ++ g; return *this; }
+const Bureaucrat::Grade	& Form::ExecutionGrade::operator *(void) const throw ()
+{ return *this; }
+Form::ExecutionGrade	& Form::ExecutionGrade::operator ++ (void) throw ()
+{ Grade::operator -- (); return *this; }
+Form::ExecutionGrade	& Form::ExecutionGrade::operator -- (void) throw ()
+{ Grade::operator ++ (); return *this; }
 bool	Form::ExecutionGrade::operator < (const ExecutionGrade	& other)
-	const throw () { return g < other.g; }
+	const throw () { return Grade::operator < (other); }
 bool	Form::ExecutionGrade::operator > (const ExecutionGrade	& other)
-	const throw () { return other.g < g; }
+	const throw () { return other < *this; }
 
 
 // frens ·‿·
 
-std::ostream
-& operator << (std::ostream	& os, const Form::ExecutionGrade	& eg)
-{ return os << static_cast <unsigned short>(*eg); }
+std::ostream	& operator << (std::ostream	& s, const Form::ExecutionGrade	& g)
+{ return s << *g; }
 
 
 
@@ -213,7 +211,7 @@ std::ostream
 
 // Constants
 
-const std::string	Form::GradeTooHighException::c_what ("Grade too high");
+const std::string	Form::GradeTooHighException::c_what ("Grade be too high");
 
 
 // Canonical Four
@@ -235,7 +233,7 @@ Form::GradeTooHighException::~ GradeTooHighException	(void) throw ()		{}
 
 // Constants
 
-const std::string	Form::GradeTooLowException::c_what ("Grade too low");
+const std::string	Form::GradeTooLowException::c_what ("Grade be too low");
 
 
 // Canonical Four

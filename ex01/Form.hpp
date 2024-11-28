@@ -6,12 +6,14 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 16:59:07 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/20 19:36:18 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/11/28 23:21:58 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FORM_HPP
 # define FORM_HPP
+
+# include "Bureaucrat.hpp"
 
 # include <memory> // auto_ptr
 # include <ostream>
@@ -22,8 +24,6 @@
 
 # define WARN_UNUSED_RESULT	__attribute__ ((warn_unused_result))
 # define VIEW				const throw () WARN_UNUSED_RESULT
-
-class Bureaucrat;
 
 
 // outer Class
@@ -60,9 +60,7 @@ class Form {
 	};
 
 public:
-	class SigningGrade {
-		unsigned char	g;
-	
+	class SigningGrade: Bureaucrat::Grade {
 		SigningGrade	(void)								throw ();
 		SigningGrade	& operator = (const SigningGrade &)	throw ();
 	public:
@@ -71,15 +69,13 @@ public:
 	
 		explicit SigningGrade	(const unsigned char & grade) throw ();
 	
-		const unsigned char	& operator *(void) VIEW;
+		const Grade	& operator *(void) VIEW;
 		SigningGrade	& operator ++ (void) throw (),
 						& operator -- (void) throw ();
-		inline bool	operator < (const SigningGrade &) VIEW;
-		inline bool	operator > (const SigningGrade &) VIEW;
+		bool	operator < (const SigningGrade &) VIEW,
+				operator > (const SigningGrade &) VIEW;
 	};
-	class ExecutionGrade {
-		unsigned char	g;
-	
+	class ExecutionGrade: Bureaucrat::Grade {
 		ExecutionGrade		(void)									throw ();
 		ExecutionGrade		& operator = (const ExecutionGrade &)	throw ();
 	public:
@@ -88,11 +84,11 @@ public:
 	
 		explicit ExecutionGrade	(const unsigned char & grade) throw ();
 	
-		const unsigned char	& operator *(void) VIEW;
+		const Grade	& operator *(void) VIEW;
 		ExecutionGrade	& operator ++ (void) throw (),
 						& operator -- (void) throw ();
-		bool	operator < (const ExecutionGrade &) VIEW;
-		bool	operator > (const ExecutionGrade &) VIEW;
+		bool	operator < (const ExecutionGrade &) VIEW,
+				operator > (const ExecutionGrade &) VIEW;
 	};
 
 
