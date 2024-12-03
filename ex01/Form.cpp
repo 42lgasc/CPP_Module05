@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:01:28 by lgasc             #+#    #+#             */
-/*   Updated: 2024/11/28 23:18:35 by lgasc            ###   ########.fr       */
+/*   Updated: 2024/12/03 03:59:38 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,9 +147,9 @@ Form::SigningGrade::SigningGrade	(const unsigned char	& grade) throw ():
 const Bureaucrat::Grade	& Form::SigningGrade::operator *(void) const throw ()
 { return *this; }
 Form::SigningGrade	& Form::SigningGrade::operator ++ (void) throw ()
-{ Grade::operator -- (); return *this; }
-Form::SigningGrade	& Form::SigningGrade::operator -- (void) throw ()
 { Grade::operator ++ (); return *this; }
+Form::SigningGrade	& Form::SigningGrade::operator -- (void) throw ()
+{ Grade::operator -- (); return *this; }
 bool	Form::SigningGrade::operator < (const SigningGrade	& other)
 	const throw () { return Grade::operator < (other); }
 bool	Form::SigningGrade::operator > (const SigningGrade	& other)
@@ -189,9 +189,9 @@ Form::ExecutionGrade::ExecutionGrade	(const unsigned char	& grade)
 const Bureaucrat::Grade	& Form::ExecutionGrade::operator *(void) const throw ()
 { return *this; }
 Form::ExecutionGrade	& Form::ExecutionGrade::operator ++ (void) throw ()
-{ Grade::operator -- (); return *this; }
-Form::ExecutionGrade	& Form::ExecutionGrade::operator -- (void) throw ()
 { Grade::operator ++ (); return *this; }
+Form::ExecutionGrade	& Form::ExecutionGrade::operator -- (void) throw ()
+{ Grade::operator -- (); return *this; }
 bool	Form::ExecutionGrade::operator < (const ExecutionGrade	& other)
 	const throw () { return Grade::operator < (other); }
 bool	Form::ExecutionGrade::operator > (const ExecutionGrade	& other)
