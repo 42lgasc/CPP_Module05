@@ -6,7 +6,7 @@
 /*   By: lgasc <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 17:23:52 by lgasc             #+#    #+#             */
-/*   Updated: 2025/02/13 15:51:19 by lgasc            ###   ########.fr       */
+/*   Updated: 2025/05/13 17:05:14 by lgasc            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@
 
 
 
-static std::string
-ft_concatenate(const std::string & prefix, const unsigned char & suffix)
+static
+std::string	ft_concatenate(const std::string &, const Bureaucrat::Grade &)
 	throw ();
 
 
@@ -49,6 +49,9 @@ ft_concatenate(const std::string & prefix, const unsigned char & suffix)
 
 std::ostream	& operator << (std::ostream	& s, const Bureaucrat	& b)
 { return s << b.getName() << ", bureaucrat grade " << b.getGrade(); }
+
+std::ostream	& operator << (std::ostream	& s, const Bureaucrat::Grade	& g)
+{ return s << static_cast <unsigned short>(*g); }
 
 
 
@@ -83,10 +86,17 @@ Bureaucrat::~ Bureaucrat	(void)                          throw () {}
 
 // other Constructors
 
+Bureaucrat::
+Bureaucrat(const std::string	& name_arg, const Bureaucrat::Grade	& g)
+	throw (GradeTooHighException, GradeTooLowException):
+		name (name_arg),	grade (g) {
+	if (grade < c_lowest_grade)  throw GradeTooLowException  ();
+	if (grade > c_highest_grade) throw GradeTooHighException ();
+}
 Bureaucrat::Bureaucrat
 	(const std::string	& new_name, const unsigned char	& new_grade)
 	throw (GradeTooHighException, GradeTooLowException):
-		name (new_name), grade (new_grade) {
+		name (new_name),	grade (new_grade) {
 	if (grade < c_lowest_grade)  throw GradeTooLowException  ();
 	if (grade > c_highest_grade) throw GradeTooHighException ();
 }
@@ -182,7 +192,7 @@ void	Bureaucrat::signForm(AForm	& f) const throw () {
 // Constants
 
 const std::string	Bureaucrat::GradeTooHighException::what
-	= ft_concatenate("Grade cannot be higher than ", + c_highest_grade);
+	= ft_concatenate("Grade cannot be higher than ", c_highest_grade);
 
 
 // Canonical Four
@@ -207,7 +217,7 @@ Bureaucrat::GradeTooHighException::~ GradeTooHighException	(void) throw () {}
 // Constants
 
 const std::string	Bureaucrat::GradeTooLowException::what
-	= ft_concatenate("Grade cannot be lower than ", + c_lowest_grade);
+	= ft_concatenate("Grade cannot be lower than ", c_lowest_grade);
 
 
 // Canonical Four
@@ -257,6 +267,13 @@ Bureaucrat::Grade	& Bureaucrat::Grade::operator -- (void) throw ()
 Bureaucrat::Grade	  Bureaucrat::Grade::operator -- (int)  throw ()
 { Grade	before (*this); -- *this; return before; }
 
+Bureaucrat::Grade
+Bureaucrat::Grade::operator + (const unsigned char	& upgrade  ) const throw ()
+{ return Grade (g - upgrade  ); }
+Bureaucrat::Grade
+Bureaucrat::Grade::operator - (const unsigned char	& downgrade) const throw ()
+{ return Grade (g + downgrade); }
+
 bool	Bureaucrat::Grade::operator <  (const Grade	& other) const throw ()
 { return g            >  other.g; }
 bool	Bureaucrat::Grade::operator >  (const Grade	& other) const throw ()
@@ -273,7 +290,11 @@ bool	Bureaucrat::Grade::operator != (const Grade	& other) const throw ()
 
 // Conversions
 
-Bureaucrat::Grade::operator unsigned short	(void) const throw () { return g; }
+// Explicit conversion requires C++11.
+// 	Bureaucrat::Grade::operator unsigned short	(void) const throw ()
+// 	{ return g; }
+const Bureaucrat::t_grade_num	& Bureaucrat::Grade::operator *(void) const
+throw () { return g; }
 
 
 
@@ -282,9 +303,6 @@ Bureaucrat::Grade::operator unsigned short	(void) const throw () { return g; }
 // Utilities
 // ////
 
-std::string	ft_concatenate
-		(const std::string	& prefix, const unsigned char	& suffix) throw () {
-	std::ostringstream	s;
-	s << prefix << static_cast <unsigned short>(suffix);
-	return s.str();
-}
+static std::string
+	ft_concatenate(const std::string	& str, const Bureaucrat::Grade	& g)
+throw () { std::ostringstream	oss; oss << str << g; return oss.str(); }
